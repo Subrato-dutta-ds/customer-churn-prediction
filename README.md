@@ -25,6 +25,34 @@ This project is an **end-to-end machine learning solution** that helps businesse
 
 ---
 
+## 📸 Screenshots
+
+### 🏠 Main Page
+![Main Page](screenshots/main.png)
+
+### 📊 Dashboard
+![Dashboard](screenshots/dashboard1.png)
+
+### 📊 Dashboard - More Charts
+![Dashboard 2](screenshots/dashboard2.png)
+
+### 🔮 Predictor
+![Predictor](screenshots/predictor.png)
+
+### 📊 Prediction Result
+![Prediction Result](screenshots/prediction_result.png)
+
+### 📈 Recommendations
+![Recommendations](screenshots/recommendations1.png)
+
+### 💰 ROI & Business Impact
+![ROI](screenshots/roi.png)
+
+### 🎯 Retention Strategies
+![Strategies](screenshots/strategies.png)
+
+---
+
 ## 🎯 Business Problem
 
 Customer churn is a critical challenge for subscription-based businesses:
@@ -60,7 +88,6 @@ Customer churn is a critical challenge for subscription-based businesses:
 | **Streamlit** | Interactive dashboard |
 | **Plotly** | Interactive visualizations |
 | **Docker** | Containerization |
-| **GitHub Actions** | CI/CD pipeline (coming soon) |
 
 ---
 
@@ -100,7 +127,8 @@ customer-churn-prediction/
 │
 ├── Dockerfile # Docker configuration
 ├── requirements.txt # Dependencies
-└── README.md # Documentation
+└── README.md # Documentation 
+
 
 
 ---
@@ -165,4 +193,5 @@ The system provides **personalized recommendations** based on risk level:
 ### Build the Image
 ```bash
 docker build -t churn-predictor .
-
+## Run the Container
+docker run -p 8501:8501 churn-predictor

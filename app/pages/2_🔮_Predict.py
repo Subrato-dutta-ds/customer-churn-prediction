@@ -1,8 +1,15 @@
+import sys
+import os
+
+# Absolute path to project root (works always)
+project_root = r"C:\Users\subrato dutta\Desktop\All_data_science_projects\Customer_churn_prediction"
+sys.path.insert(0, project_root)
+
 import streamlit as st
 import pandas as pd
 import joblib
 from sklearn.preprocessing import LabelEncoder
-from src.data import load_data
+from src.recommendations import get_interventions   # <-- IMPORT added
 
 st.set_page_config(page_title="Churn Predictor", layout="wide")
 
@@ -182,7 +189,8 @@ def load_model():
         model = joblib.load('models/churn_pipeline.pkl')
         scaler = joblib.load('models/scaler.pkl')
         return model, scaler
-    except:
+    except Exception as e:
+        st.error(f"⚠️ Error loading model: {e}")
         return None, None
 
 model, scaler = load_model()
@@ -302,33 +310,16 @@ with col_right:
     
     with col1:
         if st.button("🔴 High Risk", use_container_width=True):
-            # Set High Risk scenario
-            tenure = 6
-            contract = "Month-to-month"
-            monthly_charges = 95
-            online_security = "No"
-            payment_method = "Electronic check"
-            st.rerun()
+            # For demo, just show a message
+            st.info("Set values manually for High Risk: tenure=6, contract=Month-to-month, charges=95")
     
     with col2:
         if st.button("🟡 Medium Risk", use_container_width=True):
-            # Set Medium Risk scenario
-            tenure = 18
-            contract = "One year"
-            monthly_charges = 70
-            online_security = "No"
-            payment_method = "Electronic check"
-            st.rerun()
+            st.info("Set values manually for Medium Risk: tenure=18, contract=One year, charges=70")
     
     with col3:
         if st.button("🟢 Low Risk", use_container_width=True):
-            # Set Low Risk scenario
-            tenure = 48
-            contract = "Two year"
-            monthly_charges = 45
-            online_security = "Yes"
-            payment_method = "Credit card"
-            st.rerun()
+            st.info("Set values manually for Low Risk: tenure=48, contract=Two year, charges=45")
 
 # Prediction results
 if predict_btn:
@@ -442,39 +433,26 @@ if predict_btn:
             </div>
             """, unsafe_allow_html=True)
         
-        # Recommendations
+        # ---- Recommendations ----
         st.markdown("---")
         st.markdown("### 💡 Retention Recommendations")
-        
-        recommendations = []
-        if contract == "Month-to-month":
-            recommendations.append("📅 Offer 10% discount to switch to 1-year contract")
-        if tenure < 12:
-            recommendations.append("🎁 Send welcome rewards or loyalty bonus")
-        if monthly_charges > 80:
-            recommendations.append("💰 Offer $10/month discount for 6 months")
-        if online_security == "No":
-            recommendations.append("🔒 Offer free Online Security for 3 months")
-        if payment_method == "Electronic check":
-            recommendations.append("💳 Offer $5 credit to switch to auto-pay")
-        if probability > 0.7:
-            recommendations.append("📞 Priority support call within 24 hours")
-        if internet_service == "Fiber optic" and online_security == "No":
-            recommendations.append("🔐 Free fiber internet upgrade for 1 month")
-        if partner == "No" and dependents == "No":
-            recommendations.append("👥 Offer family plan or referral bonus")
-        
-        if recommendations:
-            for rec in recommendations:
+
+        # NEW: call the centralized function
+        interventions = get_interventions(customer_data, probability)
+
+        if interventions:
+            for rec in interventions:
                 st.markdown(f"""
                 <div class="recommendation-item">
-                    {rec}
+                    <strong>{rec['issue']}</strong><br>
+                    ✅ {rec['action']}<br>
+                    📊 Impact: {rec['impact']}
                 </div>
                 """, unsafe_allow_html=True)
         else:
             st.success("✅ No immediate interventions needed. Customer is low risk.")
         
-        # Risk Factors Analysis
+        # ---- Risk Factors Analysis ----
         st.markdown("---")
         st.markdown("### 🔍 Risk Factors Analysis")
         

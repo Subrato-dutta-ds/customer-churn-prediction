@@ -1,9 +1,18 @@
+import sys
+import os
+
+# Absolute path to your project root (works every time)
+project_root = r"C:\Users\subrato dutta\Desktop\All_data_science_projects\Customer_churn_prediction"
+sys.path.insert(0, project_root)
+
+# Now import Streamlit and other libraries
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np
+from src.data import load_data   
 
+# ... rest of your code
 st.set_page_config(page_title="Dashboard", layout="wide")
 
 # Custom CSS for Dark Theme

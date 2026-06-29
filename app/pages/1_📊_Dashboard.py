@@ -98,10 +98,7 @@ st.title("🚀 Churn Analytics Dashboard")
 st.markdown("### 📊 Overview of customer churn metrics and insights")
 
 # Load data
-@st.cache_data
-def load_data():
-    df = pd.read_csv('data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv')
-    return df
+from src.data import load_data
 
 df = load_data()
 

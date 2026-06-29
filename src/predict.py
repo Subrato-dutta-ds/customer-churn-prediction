@@ -1,30 +1,36 @@
 import joblib
+import pickle
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 
-def load_model():
-    """Load the trained pipeline."""
-    return joblib.load('models/churn_pipeline.pkl')
-
-def load_scaler():
-    """Load the scaler."""
-    return joblib.load('models/scaler.pkl')
+def load_model_and_encoders():
+    """Load model, scaler, and fitted encoders."""
+    model = joblib.load('models/churn_pipeline.pkl')
+    scaler = joblib.load('models/scaler.pkl')
+    with open('models/encoders.pkl', 'rb') as f:
+        encoders = pickle.load(f)
+    return model, scaler, encoders
 
 def predict_churn(customer_data):
-    """Predict churn probability for a single customer."""
-    model = load_model()
-    scaler = load_scaler()
+    """
+    Predict churn probability for a single customer.
     
+    Args:
+        customer_data (dict): Feature values for a customer.
+    
+    Returns:
+        dict: Prediction details.
+    """
+    model, scaler, encoders = load_model_and_encoders()
     df = pd.DataFrame([customer_data])
     
+    # Use saved encoders (transform only)
     categorical_cols = ['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines',
                        'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
                        'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract',
                        'PaperlessBilling', 'PaymentMethod']
     
     for col in categorical_cols:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
+        df[col] = encoders[col].transform(df[col])
     
     numerical_cols = ['tenure', 'MonthlyCharges', 'TotalCharges']
     df[numerical_cols] = scaler.transform(df[numerical_cols])
@@ -32,15 +38,16 @@ def predict_churn(customer_data):
     probability = model.predict_proba(df)[0][1]
     prediction = model.predict(df)[0]
     
+    # Risk level
     if probability >= 0.7:
-        risk_level = 'High Risk 🚨'
+        risk = 'High Risk 🚨'
     elif probability >= 0.4:
-        risk_level = 'Medium Risk ⚠️'
+        risk = 'Medium Risk ⚠️'
     else:
-        risk_level = 'Low Risk ✅'
+        risk = 'Low Risk ✅'
     
     return {
         'churn_prediction': int(prediction),
         'churn_probability': float(probability),
-        'risk_level': risk_level
+        'risk_level': risk
     }
